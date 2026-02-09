@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grafana Dashboard Emulation</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <i class="fas fa-bars"></i>
+            <span class="logo">Home</span>
+            <span class="separator">></span>
+            <span>Dashboards</span>
+            <span class="separator">></span>
+            <span class="active">Performance</span>
+            <span class="separator">></span>
+            <span class="active" id="display-path">Loki slow requests</span>
+        </div>
+        <div class="nav-right">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search...">
+            </div>
+            <i class="fas fa-plus"></i>
+            <i class="fas fa-question-circle"></i>
+        </div>
+    </nav>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <div class="toolbar-left">
+            <div class="dropdown">
+                <label>service</label>
+                <div class="select">All <i class="fas fa-times"></i></div>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="dropdown">
+                <label>client_name</label>
+                <div class="select" id="display-client-name">cluster-prod-01.internal</div>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="dropdown">
+                <label>limit</label>
+                <div class="select">100</div>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+             <div class="input-group">
+                <label>url</label>
+                <input type="text" value="*">
+            </div>
+        </div>
+        <div class="toolbar-right">
+            <div class="time-picker">
+                <i class="far fa-clock"></i>
+                <span id="display-time-range">Last 6 hours</span>
+            </div>
+            <button class="btn-refresh"><i class="fas fa-sync"></i></button>
+        </div>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-container">
+
+        <!-- Row: Performance Header -->
+        <div class="section-header">
+            <i class="fas fa-chevron-down"></i> Performance
+        </div>
+
+        <!-- Row: Request Performance (Histogram) -->
+        <div class="panel-row">
+            <div class="panel" style="width: 100%">
+                <div class="panel-header">
+                    <span>request performance</span>
+                    <i class="fas fa-info-circle info-icon"></i>
+                </div>
+                <div class="panel-content chart-container">
+                    <canvas id="chartRequestPerformance"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row: Request Performance by URLs -->
+        <div class="panel-row">
+            <div class="panel" style="width: 100%">
+                <div class="panel-header">
+                    <span>request performance by URLs</span>
+                    <i class="fas fa-info-circle info-icon"></i>
+                </div>
+                <div class="panel-content chart-container">
+                    <canvas id="chartRequestPerformanceUrl"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row: General Header -->
+        <div class="section-header">
+            <i class="fas fa-chevron-down"></i> General
+        </div>
+
+        <!-- Row: Stats & Slow Request Rate -->
+        <div class="panel-row grid-cols-2">
+            <div class="stats-column">
+                <div class="panel single-stat">
+                    <div class="stat-title">slow</div>
+                    <div class="stat-value green" id="stat-slow">16</div>
+                </div>
+                <div class="panel single-stat">
+                    <div class="stat-title">total</div>
+                    <div class="stat-value green" id="stat-total">16</div>
+                </div>
+                <div class="panel single-stat">
+                    <div class="stat-title">percentage of slow</div>
+                    <div class="stat-value green" id="stat-percent">100%</div>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel-header">
+                    <span>Slow request rate [1m]</span>
+                </div>
+                <div class="panel-content chart-container">
+                    <canvas id="chartSlowRate"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row: Slow Requests Table -->
+        <div class="panel-row">
+            <div class="panel" style="width: 100%">
+                <div class="panel-header">
+                    <span>slow requests >= 0ms</span>
+                </div>
+                <div class="panel-content">
+                    <table class="data-table" id="slow-requests-table">
+                        <thead>
+                            <tr>
+                                <th>Time <i class="fas fa-filter"></i></th>
+                                <th>responseTime <i class="fas fa-sort-down"></i></th>
+                                <th>method</th>
+                                <th>status</th>
+                                <th>reqId</th>
+                                <th>url</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- JS will populate this -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row: Slow Request Count -->
+        <div class="panel-row">
+            <div class="panel" style="width: 100%">
+                <div class="panel-header">
+                    <span>Slow request count</span>
+                </div>
+                <div class="panel-content chart-container">
+                    <canvas id="chartSlowCount"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
