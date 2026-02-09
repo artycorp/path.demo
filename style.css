@@ -208,6 +208,15 @@ table {
     font-family: monospace;
 }
 
+.data-table a {
+    color: var(--accent-blue);
+    text-decoration: none;
+}
+
+.data-table a:hover {
+    text-decoration: underline;
+}
+
 .data-table th {
     background-color: #202226;
     padding: 8px;

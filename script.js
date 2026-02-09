@@ -181,9 +181,9 @@ document.addEventListener("DOMContentLoaded", function () {
         data: {
             labels: labels1,
             datasets: [
-                { label: '/api/v1/auth/login', data: Array.from({length: 20}, () => Math.random() > 0.8 ? 1 : 0), backgroundColor: '#ff9830' },
-                { label: '/api/v2/user/profile', data: Array.from({length: 20}, () => Math.random() > 0.8 ? 1 : 0), backgroundColor: '#f2495c' },
-                { label: '/v1/search/query', data: Array.from({length: 20}, () => Math.random() > 0.8 ? 1 : 0), backgroundColor: '#3274d9' }
+                { label: '/v1/auth/login', data: Array.from({length: 20}, () => Math.random() > 0.8 ? 1 : 0), backgroundColor: '#ff9830' },
+                { label: '/v1/profile', data: Array.from({length: 20}, () => Math.random() > 0.8 ? 1 : 0), backgroundColor: '#f2495c' },
+                { label: '/v1/users?limit=10', data: Array.from({length: 20}, () => Math.random() > 0.8 ? 1 : 0), backgroundColor: '#3274d9' }
             ]
         },
         options: {
@@ -250,39 +250,24 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // 5. Populate Data Table
+    // 5. Populate Data Table with HAR data
     const tableBody = document.querySelector('#slow-requests-table tbody');
-    const methods = ['GET', 'POST', 'DELETE', 'PATCH', 'PUT'];
-    const statuses = [200, 400, 401, 403, 404, 500, 502, 503];
-    const services = ['auth', 'billing', 'inventory', 'shipping', 'analytics', 'gateway'];
-    const resourceTypes = ['user', 'order', 'item', 'session', 'report'];
-    
-    function generateID(len) {
-        let r = '';
-        const c = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        for (let i = 0; i < len; i++) r += c.charAt(Math.floor(Math.random() * c.length));
-        return r;
-    }
+    const harRows = [
+        { time: '2026-02-09 10:00:00', responseTime: '150.5 ms', method: 'GET',  status: 200, requestId: 'req-users-001',        url: '/v1/users?limit=10' },
+        { time: '2026-02-09 10:00:01', responseTime: '450.0 ms', method: 'POST', status: 200, requestId: 'req-auth-login',        url: '/v1/auth/login' },
+        { time: '2026-02-09 10:00:02', responseTime: '80.0 ms',  method: 'GET',  status: 304, requestId: 'req-static-logo',       url: '/assets/logo.png' },
+        { time: '2026-02-09 10:00:03', responseTime: '200.0 ms', method: 'GET',  status: 200, requestId: 'req-p1',                url: '/v1/parallel/1' },
+        { time: '2026-02-09 10:00:04', responseTime: '120.0 ms', method: 'GET',  status: 404, requestId: 'req-profile-404',       url: '/v1/profile' },
+        { time: '2026-02-09 10:00:05', responseTime: '1200.0 ms', method: 'PUT', status: 500, requestId: 'req-users-update-err',  url: '/v1/users/123' },
+    ]
 
-    function generateRow() {
-        const d = new Date(); d.setMinutes(d.getMinutes() - Math.floor(Math.random() * 300));
-        const t = d.toISOString().split('T')[0] + ' ' + d.toTimeString().split(' ')[0];
-        const ms = Math.floor(Math.random() * 800 + 200) + ' ms';
-        const m = methods[Math.floor(Math.random() * methods.length)];
-        const s = statuses[Math.floor(Math.random() * statuses.length)];
-        const rid = generateID(16);
-        const svc = services[Math.floor(Math.random() * services.length)];
-        const res = resourceTypes[Math.floor(Math.random() * resourceTypes.length)];
-        const u = `/api/v${Math.floor(Math.random()*3)+1}/${svc}/${res}/${generateID(8)}`;
-        return `<tr><td>${t}</td><td style="color: #ff9830">${ms}</td><td>${m}</td><td>${s}</td><td style="color: #3274d9">${rid}</td><td>${u}</td></tr>`;
-    }
-
-    let rowsHtml = '';
-    for (let i = 0; i < 10; i++) rowsHtml += generateRow();
+    const rowsHtml = harRows.map(r => {
+        const link = `<a href="../request.demo/index.html?requestId=${encodeURIComponent(r.requestId)}">${r.requestId}</a>`
+        return `<tr><td>${r.time}</td><td style="color: #ff9830">${r.responseTime}</td><td>${r.method}</td><td>${r.status}</td><td>${link}</td><td>${r.url}</td></tr>`
+    }).join('')
     tableBody.innerHTML = rowsHtml;
 
-    setInterval(() => {
-        document.getElementById('stat-slow').innerText = Math.floor(Math.random() * 20) + 10;
-        document.getElementById('stat-total').innerText = Math.floor(Math.random() * 50) + 20;
-    }, 5000);
+    // Fixed stats from HAR data: 3 slow (>200ms), 6 total
+    document.getElementById('stat-slow').innerText = '3';
+    document.getElementById('stat-total').innerText = '6';
 });
