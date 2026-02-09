@@ -261,8 +261,11 @@ document.addEventListener("DOMContentLoaded", function () {
         { time: '2026-02-09 10:00:05', responseTime: '1200.0 ms', method: 'PUT', status: 500, requestId: 'req-users-update-err',  url: '/v1/users/123' },
     ]
 
+    // Sort by responseTime descending
+    harRows.sort((a, b) => parseFloat(b.responseTime) - parseFloat(a.responseTime));
+
     const rowsHtml = harRows.map(r => {
-        const link = `<a href="../request.demo/index.html?requestId=${encodeURIComponent(r.requestId)}">${r.requestId}</a>`
+        const link = `<a href="https://artycorp.github.io/request.demo/index.html?requestId=${encodeURIComponent(r.requestId)}">${r.requestId}</a>`
         return `<tr><td>${r.time}</td><td style="color: #ff9830">${r.responseTime}</td><td>${r.method}</td><td>${r.status}</td><td>${link}</td><td>${r.url}</td></tr>`
     }).join('')
     tableBody.innerHTML = rowsHtml;
